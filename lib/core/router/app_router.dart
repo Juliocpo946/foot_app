@@ -71,7 +71,7 @@ class AppRouter {
       }
 
       if (authStatus == AuthStatus.unauthenticated) {
-        return isGoingToAuth || isGoingToSplash ? null : AppRoutes.loginPath;
+        return isGoingToAuth ? null : AppRoutes.loginPath;
       }
 
       if (authStatus == AuthStatus.authenticated) {
