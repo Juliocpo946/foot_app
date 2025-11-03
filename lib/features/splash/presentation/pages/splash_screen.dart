@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/splash_provider.dart';
+import '../../../../core/application/app_state.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -14,17 +14,19 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<SplashProvider>(context, listen: false).checkAuthStatus();
+      Provider.of<AppState>(context, listen: false).checkAuthStatus();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: NetworkImage(
+            image: const NetworkImage(
               'https://images.unsplash.com/photo-1504674900247-0877df9cc836',
             ),
             fit: BoxFit.cover,
@@ -42,19 +44,19 @@ class _SplashScreenState extends State<SplashScreen> {
                 width: 120,
                 height: 120,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: theme.colorScheme.surface,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.restaurant_menu,
                   size: 60,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: theme.colorScheme.primary,
                 ),
               ),
               const SizedBox(height: 24),
               Text(
                 'Deliv',
-                style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                style: theme.textTheme.displayMedium?.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),

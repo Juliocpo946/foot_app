@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../../../auth_shared/domain/entities/user.dart';
-import '../../../auth_shared/domain/usecases/register_usecase.dart';
+import '../../domain/usecases/register_usecase.dart';
 
 enum RegisterState { initial, loading, success, error }
 

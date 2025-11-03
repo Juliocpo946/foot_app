@@ -5,6 +5,7 @@ import '../../features/register/presentation/pages/register_screen.dart';
 import '../../features/home/presentation/pages/home_screen.dart';
 import '../../features/meal_detail/presentation/pages/meal_detail_screen.dart';
 import '../../features/profile/presentation/pages/profile_screen.dart';
+import '../../features/favorites/presentation/pages/favorites_screen.dart';
 import '../application/app_state.dart';
 import 'routes.dart';
 
@@ -49,6 +50,11 @@ class AppRouter {
         path: AppRoutes.profilePath,
         name: AppRoutes.profile,
         builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.favoritesPath,
+        name: AppRoutes.favorites,
+        builder: (context, state) => const FavoritesScreen(),
       ),
     ],
     redirect: (context, state) {

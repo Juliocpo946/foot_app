@@ -35,6 +35,18 @@ class MealRepositoryImpl implements MealRepository {
   }
 
   @override
+  Future<Either<Failure, List<Meal>>> getMealsByArea(String area) async {
+    try {
+      final meals = await remoteDataSource.getMealsByArea(area);
+      return Right(meals);
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
+
+  @override
   Future<Either<Failure, Meal>> getMealById(String id) async {
     try {
       final meal = await remoteDataSource.getMealById(id);
@@ -51,6 +63,18 @@ class MealRepositoryImpl implements MealRepository {
     try {
       final categories = await remoteDataSource.getCategories();
       return Right(categories);
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<String>>> getAreas() async {
+    try {
+      final areas = await remoteDataSource.getAreas();
+      return Right(areas);
     } on NetworkException catch (e) {
       return Left(NetworkFailure(e.message));
     } on ServerException catch (e) {

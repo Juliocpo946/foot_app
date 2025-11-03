@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import '../../../../core/error/failures.dart';
-import '../repositories/meal_repository.dart';
+import '../../../meals_shared/domain/repositories/meal_repository.dart';
 
 class GetCategoriesUseCase {
   final MealRepository repository;

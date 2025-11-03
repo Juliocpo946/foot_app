@@ -8,8 +8,10 @@ import '../models/meal_model.dart';
 abstract class MealRemoteDataSource {
   Future<List<MealModel>> searchMeals(String query);
   Future<List<MealModel>> getMealsByCategory(String category);
+  Future<List<MealModel>> getMealsByArea(String area);
   Future<MealModel> getMealById(String id);
   Future<List<String>> getCategories();
+  Future<List<String>> getAreas();
 }
 
 class MealRemoteDataSourceImpl implements MealRemoteDataSource {
@@ -27,10 +29,10 @@ class MealRemoteDataSourceImpl implements MealRemoteDataSource {
 
       if (response.statusCode == 200) {
         final data = response.data;
-        if (data['meals_shared'] == null) {
+        if (data['meals'] == null) {
           return [];
         }
-        return (data['meals_shared'] as List)
+        return (data['meals'] as List)
             .map((json) => MealModel.fromJson(json))
             .toList();
       }
@@ -40,7 +42,7 @@ class MealRemoteDataSourceImpl implements MealRemoteDataSource {
       AppLogger.logError('MEAL_REMOTE', 'Error de red', e.response?.statusCode);
       throw NetworkException('Sin conexión');
     } catch (e) {
-      AppLogger.logError('MEAL_REMOTE', 'Error inesperado');
+      AppLogger.logError('MEAL_REMOTE', 'Error inesperado: ${e.toString()}');
       throw ServerException('Error del servidor');
     }
   }
@@ -55,15 +57,20 @@ class MealRemoteDataSourceImpl implements MealRemoteDataSource {
 
       if (response.statusCode == 200) {
         final data = response.data;
-        if (data['meals_shared'] == null) {
+        if (data['meals'] == null) {
           return [];
         }
 
         List<MealModel> meals = [];
-        for (var item in data['meals_shared']) {
+        for (var item in (data['meals'] as List)) {
           try {
-            final detailResponse = await getMealById(item['idMeal']);
-            meals.add(detailResponse);
+            final mealStub = MealModel.fromJson({
+              'idMeal': item['idMeal'],
+              'strMeal': item['strMeal'],
+              'strMealThumb': item['strMealThumb'],
+              'strCategory': category,
+            });
+            meals.add(mealStub);
           } catch (e) {
             continue;
           }
@@ -72,6 +79,43 @@ class MealRemoteDataSourceImpl implements MealRemoteDataSource {
       }
 
       throw ServerException('Error al filtrar', response.statusCode);
+    } on DioException {
+      throw NetworkException('Sin conexión');
+    }
+  }
+
+  @override
+  Future<List<MealModel>> getMealsByArea(String area) async {
+    try {
+      final response = await httpClient.dio.get(
+        '${ApiConstants.baseUrl}${ApiConstants.filterByArea}',
+        queryParameters: {'a': area},
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data['meals'] == null) {
+          return [];
+        }
+
+        List<MealModel> meals = [];
+        for (var item in (data['meals'] as List)) {
+          try {
+            final mealStub = MealModel.fromJson({
+              'idMeal': item['idMeal'],
+              'strMeal': item['strMeal'],
+              'strMealThumb': item['strMealThumb'],
+              'strArea': area,
+            });
+            meals.add(mealStub);
+          } catch (e) {
+            continue;
+          }
+        }
+        return meals;
+      }
+
+      throw ServerException('Error al filtrar por área', response.statusCode);
     } on DioException {
       throw NetworkException('Sin conexión');
     }
@@ -87,10 +131,10 @@ class MealRemoteDataSourceImpl implements MealRemoteDataSource {
 
       if (response.statusCode == 200) {
         final data = response.data;
-        if (data['meals_shared'] == null || data['meals_shared'].isEmpty) {
+        if (data['meals'] == null || data['meals'].isEmpty) {
           throw ServerException('Comida no encontrada');
         }
-        return MealModel.fromJson(data['meals_shared'][0]);
+        return MealModel.fromJson(data['meals'][0]);
       }
 
       throw ServerException('Error al obtener detalle', response.statusCode);
@@ -117,6 +161,29 @@ class MealRemoteDataSourceImpl implements MealRemoteDataSource {
       }
 
       throw ServerException('Error al obtener categorías', response.statusCode);
+    } on DioException {
+      throw NetworkException('Sin conexión');
+    }
+  }
+
+  @override
+  Future<List<String>> getAreas() async {
+    try {
+      final response = await httpClient.dio.get(
+        '${ApiConstants.baseUrl}${ApiConstants.listAreas}',
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data['meals'] == null) {
+          return [];
+        }
+        return (data['meals'] as List)
+            .map((json) => json['strArea'] as String)
+            .toList();
+      }
+
+      throw ServerException('Error al obtener áreas', response.statusCode);
     } on DioException {
       throw NetworkException('Sin conexión');
     }

@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import '../../../../core/error/failures.dart';
-import '../entities/meal.dart';
-import '../repositories/meal_repository.dart';
+import '../../../meals_shared/domain/entities/meal.dart';
+import '../../../meals_shared/domain/repositories/meal_repository.dart';
 
 class GetMealByIdUseCase {
   final MealRepository repository;

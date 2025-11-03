@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../../../auth_shared/domain/entities/user.dart';
-import '../../../auth_shared/domain/usecases/login_usecase.dart';
+import '../../domain/usecases/login_usecase.dart';
 
 enum LoginState { initial, loading, success, error }
 

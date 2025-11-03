@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../theme/app_theme.dart';
 
 class RestaurantMealCard extends StatelessWidget {
   final String imageUrl;
@@ -24,7 +25,7 @@ class RestaurantMealCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -38,9 +39,9 @@ class RestaurantMealCard extends StatelessWidget {
               children: [
                 Container(
                   width: double.infinity,
-                  height: 200,
+                  height: 180,
                   decoration: BoxDecoration(
-                    color: isDark ? Colors.grey[800] : Colors.grey[200],
+                    color: theme.colorScheme.surfaceVariant,
                   ),
                   child: imageUrl.isNotEmpty
                       ? Image.network(
@@ -51,7 +52,7 @@ class RestaurantMealCard extends StatelessWidget {
                         child: Icon(
                           Icons.restaurant,
                           size: 64,
-                          color: Colors.grey[400],
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
                       );
                     },
@@ -60,7 +61,7 @@ class RestaurantMealCard extends StatelessWidget {
                     child: Icon(
                       Icons.restaurant,
                       size: 64,
-                      color: Colors.grey[400],
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),
@@ -74,7 +75,7 @@ class RestaurantMealCard extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF4CAF50),
+                        color: AppTheme.primaryGreen,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -115,53 +116,58 @@ class RestaurantMealCard extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 8),
-                  Row(
+                  Wrap(
+                    spacing: 8.0,
+                    runSpacing: 4.0,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       Icon(
                         Icons.access_time,
                         size: 16,
-                        color: Colors.grey[600],
+                        color: theme.colorScheme.onSurface.withOpacity(0.7),
                       ),
                       const SizedBox(width: 4),
                       Text(
                         'Delivery: $deliveryTime min',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.grey[600],
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurface.withOpacity(0.7),
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFF9F1C).withOpacity(0.1),
+                          color: theme.colorScheme.primary.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
                           category,
-                          style: const TextStyle(
-                            color: Color(0xFFFF9F1C),
+                          style: TextStyle(
+                            color: theme.colorScheme.primary,
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '- $area',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.grey[600],
+                      if (area.isNotEmpty)
+                        Text(
+                          '- $area',
+                          style:
+                          theme.textTheme.bodyMedium?.copyWith(
+                            color:
+                            theme.colorScheme.onSurface.withOpacity(0.7),
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ],

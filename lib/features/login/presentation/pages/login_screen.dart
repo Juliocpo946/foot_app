@@ -55,12 +55,13 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final theme = Theme.of(context);
 
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: NetworkImage(
+            image: const NetworkImage(
               'https://images.unsplash.com/photo-1504674900247-0877df9cc836',
             ),
             fit: BoxFit.cover,
@@ -86,19 +87,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: 100,
                       height: 100,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: theme.colorScheme.surface,
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         Icons.restaurant_menu,
                         size: 50,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: theme.colorScheme.primary,
                       ),
                     ),
                     const SizedBox(height: 16),
                     Text(
                       'Deliv',
-                      style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                      style: theme.textTheme.displaySmall?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
@@ -110,9 +111,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         TextButton(
                           onPressed: () {},
                           child: Text(
-                            'Log In',
+                            'Iniciar Sesión',
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.primary,
+                              color: theme.colorScheme.primary,
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
@@ -124,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             context.pushNamed(AppRoutes.register);
                           },
                           child: Text(
-                            'Register',
+                            'Registrarse',
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.7),
                               fontSize: 18,
@@ -135,7 +136,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 32),
                     CustomTextField(
-                      label: 'Email Address',
+                      label: 'Correo Electrónico',
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) {
@@ -150,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 16),
                     CustomTextField(
-                      label: 'Password',
+                      label: 'Contraseña',
                       controller: _passwordController,
                       obscureText: _obscurePassword,
                       validator: (value) {
@@ -167,7 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           _obscurePassword
                               ? Icons.visibility
                               : Icons.visibility_off,
-                          color: Colors.grey,
+                          color: theme.colorScheme.onSurface.withOpacity(0.6),
                         ),
                         onPressed: () {
                           setState(() {
@@ -180,7 +181,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Consumer<LoginProvider>(
                       builder: (context, loginProvider, child) {
                         return PrimaryButton(
-                          text: 'Log In',
+                          text: 'Iniciar Sesión',
                           onPressed: _login,
                           isLoading: loginProvider.state == LoginState.loading,
                         );
