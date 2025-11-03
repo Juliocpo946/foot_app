@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../../../../shared/components/molecules/loading_widget.dart';
 import '../../../favorites/presentation/providers/favorites_provider.dart';
 import '../../../meals_shared/domain/entities/meal.dart';
+import '../../../cart/presentation/providers/cart_provider.dart';
+import '../../../cart/domain/entities/cart_item.dart';
 import '../providers/meal_detail_provider.dart';
 
 class MealDetailScreen extends StatefulWidget {
@@ -19,8 +21,7 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<MealDetailProvider>(context, listen: false)
-          .fetchMealDetail(widget.mealId);
+      Provider.of<MealDetailProvider>(context, listen: false).fetchMealDetail(widget.mealId);
       Provider.of<FavoritesProvider>(context, listen: false).loadFavorites();
     });
   }
@@ -34,8 +35,7 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
     return Scaffold(
       body: Consumer<MealDetailProvider>(
         builder: (context, provider, child) {
-          if (provider.state == MealDetailState.loading ||
-              provider.state == MealDetailState.initial) {
+          if (provider.state == MealDetailState.loading || provider.state == MealDetailState.initial) {
             return const LoadingWidget(message: 'Cargando detalle...');
           }
 
@@ -55,9 +55,7 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
                 flexibleSpace: FlexibleSpaceBar(
                   title: Text(
                     meal.name,
-                    style: const TextStyle(shadows: [
-                      Shadow(color: Colors.black54, blurRadius: 8)
-                    ]),
+                    style: const TextStyle(shadows: [Shadow(color: Colors.black54, blurRadius: 8)]),
                   ),
                   background: meal.thumbnail.isNotEmpty
                       ? Image.network(
@@ -65,14 +63,11 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
-                        color:
-                        Theme.of(context).colorScheme.surfaceVariant,
+                        color: Theme.of(context).colorScheme.surfaceVariant,
                         child: Icon(
                           Icons.restaurant,
                           size: 100,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurfaceVariant,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       );
                     },
@@ -82,8 +77,7 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
                     child: Icon(
                       Icons.restaurant,
                       size: 100,
-                      color:
-                      Theme.of(context).colorScheme.onSurfaceVariant,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),
@@ -96,12 +90,7 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
                     children: [
                       Text(
                         meal.name,
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineMedium
-                            ?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
                       Row(
@@ -119,27 +108,32 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
                             ),
                         ],
                       ),
+                      const SizedBox(height: 16),
+                      Text(
+                        '\$${_calculatePrice(meal.name)}',
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       const SizedBox(height: 24),
                       Text(
                         'Ingredientes',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 12),
                       _buildIngredientsList(context, meal),
                       const SizedBox(height: 24),
                       Text(
                         'Instrucciones',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 12),
                       Text(
                         meal.instructions.trim(),
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
+                      const SizedBox(height: 80),
                     ],
                   ),
                 ),
@@ -157,19 +151,29 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
           final meal = detailProvider.meal!;
           final isFavorite = favoritesProvider.isFavorite(meal.id);
 
-          return FloatingActionButton(
-            onPressed: () {
-              favoritesProvider.toggleFavorite(meal);
-            },
-            backgroundColor: isFavorite
-                ? theme.colorScheme.primary
-                : theme.colorScheme.surfaceVariant,
-            child: Icon(
-              isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: isFavorite
-                  ? theme.colorScheme.onPrimary
-                  : theme.colorScheme.onSurfaceVariant,
-            ),
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FloatingActionButton(
+                heroTag: 'favorite',
+                onPressed: () {
+                  favoritesProvider.toggleFavorite(meal);
+                },
+                backgroundColor: isFavorite ? theme.colorScheme.primary : theme.colorScheme.surfaceVariant,
+                child: Icon(
+                  isFavorite ? Icons.favorite : Icons.favorite_border,
+                  color: isFavorite ? theme.colorScheme.onPrimary : theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 16),
+              FloatingActionButton.extended(
+                heroTag: 'cart',
+                onPressed: () => _addToCart(context, meal),
+                backgroundColor: theme.colorScheme.primary,
+                icon: const Icon(Icons.add_shopping_cart),
+                label: const Text('Agregar'),
+              ),
+            ],
           );
         },
       ),
@@ -197,6 +201,32 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: ingredientWidgets,
+    );
+  }
+
+  double _calculatePrice(String mealName) {
+    return 50.0 + (mealName.length % 50) * 5.0;
+  }
+
+  void _addToCart(BuildContext context, Meal meal) {
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+
+    final cartItem = CartItem(
+      mealId: meal.id,
+      name: meal.name,
+      price: _calculatePrice(meal.name),
+      thumbnail: meal.thumbnail,
+      category: meal.category,
+      quantity: 1,
+    );
+
+    cartProvider.addToCart(cartItem);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${meal.name} agregado al carrito'),
+        duration: const Duration(seconds: 2),
+      ),
     );
   }
 }

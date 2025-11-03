@@ -6,6 +6,8 @@ import '../../features/home/presentation/pages/home_screen.dart';
 import '../../features/meal_detail/presentation/pages/meal_detail_screen.dart';
 import '../../features/profile/presentation/pages/profile_screen.dart';
 import '../../features/favorites/presentation/pages/favorites_screen.dart';
+import '../../features/cart/presentation/pages/cart_screen.dart';
+import '../../features/orders/presentation/pages/orders_screen.dart';
 import '../application/app_state.dart';
 import 'routes.dart';
 
@@ -55,6 +57,16 @@ class AppRouter {
         path: AppRoutes.favoritesPath,
         name: AppRoutes.favorites,
         builder: (context, state) => const FavoritesScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.cartPath,
+        name: AppRoutes.cart,
+        builder: (context, state) => const CartScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.ordersPath,
+        name: AppRoutes.orders,
+        builder: (context, state) => const OrdersScreen(),
       ),
     ],
     redirect: (context, state) {

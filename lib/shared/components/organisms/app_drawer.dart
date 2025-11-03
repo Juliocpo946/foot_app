@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/application/app_state.dart';
 import '../../../core/router/routes.dart';
+import '../../../features/cart/presentation/providers/cart_provider.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -44,6 +45,30 @@ class AppDrawer extends StatelessWidget {
               context.pushReplacementNamed(AppRoutes.home);
             },
           ),
+          Consumer<CartProvider>(
+            builder: (context, cartProvider, child) {
+              return ListTile(
+                leading: Badge(
+                  label: Text('${cartProvider.itemCount}'),
+                  isLabelVisible: cartProvider.itemCount > 0,
+                  child: const Icon(Icons.shopping_cart_outlined),
+                ),
+                title: const Text('Carrito'),
+                onTap: () {
+                  context.pop();
+                  context.pushNamed(AppRoutes.cart);
+                },
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.receipt_long_outlined),
+            title: const Text('Mis Pedidos'),
+            onTap: () {
+              context.pop();
+              context.pushNamed(AppRoutes.orders);
+            },
+          ),
           ListTile(
             leading: const Icon(Icons.favorite_border),
             title: const Text('Favoritos'),
@@ -62,8 +87,7 @@ class AppDrawer extends StatelessWidget {
           ),
           const Divider(),
           ListTile(
-            leading:
-            Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
+            leading: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
             title: Text(
               'Cerrar Sesión',
               style: TextStyle(color: Theme.of(context).colorScheme.error),
