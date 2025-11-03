@@ -27,10 +27,10 @@ class MealRemoteDataSourceImpl implements MealRemoteDataSource {
 
       if (response.statusCode == 200) {
         final data = response.data;
-        if (data['meals'] == null) {
+        if (data['meals_shared'] == null) {
           return [];
         }
-        return (data['meals'] as List)
+        return (data['meals_shared'] as List)
             .map((json) => MealModel.fromJson(json))
             .toList();
       }
@@ -55,12 +55,12 @@ class MealRemoteDataSourceImpl implements MealRemoteDataSource {
 
       if (response.statusCode == 200) {
         final data = response.data;
-        if (data['meals'] == null) {
+        if (data['meals_shared'] == null) {
           return [];
         }
 
         List<MealModel> meals = [];
-        for (var item in data['meals']) {
+        for (var item in data['meals_shared']) {
           try {
             final detailResponse = await getMealById(item['idMeal']);
             meals.add(detailResponse);
@@ -87,10 +87,10 @@ class MealRemoteDataSourceImpl implements MealRemoteDataSource {
 
       if (response.statusCode == 200) {
         final data = response.data;
-        if (data['meals'] == null || data['meals'].isEmpty) {
+        if (data['meals_shared'] == null || data['meals_shared'].isEmpty) {
           throw ServerException('Comida no encontrada');
         }
-        return MealModel.fromJson(data['meals'][0]);
+        return MealModel.fromJson(data['meals_shared'][0]);
       }
 
       throw ServerException('Error al obtener detalle', response.statusCode);

@@ -1,24 +1,24 @@
 import 'package:flutter/foundation.dart';
-import '../../domain/entities/user.dart';
-import '../../domain/usecases/login_usecase.dart';
+import '../../../auth_shared/domain/entities/user.dart';
+import '../../../auth_shared/domain/usecases/login_usecase.dart';
 
-enum AuthState { initial, loading, success, error }
+enum LoginState { initial, loading, success, error }
 
-class AuthProvider extends ChangeNotifier {
+class LoginProvider extends ChangeNotifier {
   final LoginUseCase loginUseCase;
 
-  AuthProvider({required this.loginUseCase});
+  LoginProvider({required this.loginUseCase});
 
-  AuthState _state = AuthState.initial;
+  LoginState _state = LoginState.initial;
   String? _errorMessage;
   User? _user;
 
-  AuthState get state => _state;
+  LoginState get state => _state;
   String? get errorMessage => _errorMessage;
   User? get user => _user;
 
   Future<void> login(String email, String password) async {
-    _state = AuthState.loading;
+    _state = LoginState.loading;
     _errorMessage = null;
     notifyListeners();
 
@@ -26,11 +26,11 @@ class AuthProvider extends ChangeNotifier {
 
     result.fold(
           (failure) {
-        _state = AuthState.error;
+        _state = LoginState.error;
         _errorMessage = failure.message;
       },
           (user) {
-        _state = AuthState.success;
+        _state = LoginState.success;
         _user = user;
       },
     );
@@ -39,7 +39,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   void reset() {
-    _state = AuthState.initial;
+    _state = LoginState.initial;
     _errorMessage = null;
     notifyListeners();
   }

@@ -1,10 +1,9 @@
 import 'package:go_router/go_router.dart';
-import '../../features/auth/presentation/pages/splash_screen.dart';
-import '../../features/auth/presentation/pages/login_screen.dart';
-import '../../features/auth/presentation/pages/register_screen.dart';
+import '../../features/splash/presentation/pages/splash_screen.dart';
+import '../../features/login/presentation/pages/login_screen.dart';
+import '../../features/register/presentation/pages/register_screen.dart';
 import '../../features/home/presentation/pages/home_screen.dart';
 import '../../features/meal_detail/presentation/pages/meal_detail_screen.dart';
-import '../../features/favorites/presentation/pages/favorites_screen.dart';
 import '../../features/profile/presentation/pages/profile_screen.dart';
 import '../application/app_state.dart';
 import 'routes.dart';
@@ -45,11 +44,6 @@ class AppRouter {
           final id = state.pathParameters['id']!;
           return MealDetailScreen(mealId: id);
         },
-      ),
-      GoRoute(
-        path: AppRoutes.favoritesPath,
-        name: AppRoutes.favorites,
-        builder: (context, state) => const FavoritesScreen(),
       ),
       GoRoute(
         path: AppRoutes.profilePath,
