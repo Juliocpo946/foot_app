@@ -7,6 +7,8 @@ import 'core/application/app_state.dart';
 import 'core/database/database_helper.dart';
 import 'core/network/http_client.dart';
 import 'core/router/app_router.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'core/network/network_info.dart';
 
 import 'features/auth_shared/data/datasources/auth_local_datasource.dart';
 import 'features/auth_shared/data/repositories/auth_repository_impl.dart';
@@ -47,6 +49,9 @@ void main() async {
   final dbHelper = DatabaseHelper.instance;
   final httpClient = HttpClient();
 
+  final connectivity = Connectivity();
+  final NetworkInfo networkInfo = NetworkInfoImpl(connectivity);
+
   final authLocalDataSource = AuthLocalDataSourceImpl(
     dbHelper: dbHelper,
   );
@@ -61,6 +66,7 @@ void main() async {
   );
   final MealRepository mealRepository = MealRepositoryImpl(
     remoteDataSource: mealRemoteDataSource,
+    networkInfo: networkInfo,
   );
 
   final homeRemoteDataSource = HomeRemoteDataSourceImpl(
@@ -68,6 +74,7 @@ void main() async {
   );
   final HomeRepository homeRepository = HomeRepositoryImpl(
     remoteDataSource: homeRemoteDataSource,
+    networkInfo: networkInfo,
   );
 
   final searchMealsUseCase = SearchMealsUseCase(repository: homeRepository);

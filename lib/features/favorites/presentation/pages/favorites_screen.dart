@@ -5,6 +5,7 @@ import '../../../../core/router/routes.dart';
 import '../../../../shared/components/molecules/loading_widget.dart';
 import '../../../../shared/components/molecules/restaurant_meal_card.dart';
 import '../providers/favorites_provider.dart';
+import '../../../../shared/components/molecules/error_widget.dart' as app_error;
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -36,8 +37,11 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           }
 
           if (provider.state == FavoritesState.error) {
-            return Center(
-              child: Text(provider.errorMessage ?? 'Error al cargar favoritos'),
+            return app_error.ErrorWidget(
+              message: provider.errorMessage ?? 'Error al cargar favoritos',
+              onRetry: () {
+                provider.loadFavorites();
+              },
             );
           }
 

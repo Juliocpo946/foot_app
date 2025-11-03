@@ -8,6 +8,7 @@ import '../../../../shared/components/molecules/restaurant_meal_card.dart';
 import '../../../../shared/components/organisms/app_drawer.dart';
 import '../../../../shared/components/organisms/filter_bottom_sheet.dart';
 import '../providers/home_provider.dart';
+import '../../../../shared/components/molecules/error_widget.dart' as app_error;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -207,26 +208,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (homeProvider.state == HomeState.error) {
       return SliverFillRemaining(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.error_outline,
-                size: 64,
-                color: Theme.of(context).colorScheme.error,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                homeProvider.errorMessage ?? 'Error',
-                style: TextStyle(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.7)),
-              ),
-            ],
-          ),
+        child: app_error.ErrorWidget(
+          message: homeProvider.errorMessage ?? 'Ocurrió un error',
+          onRetry: () {
+            if (homeProvider.selectedCategory != null) {
+              homeProvider.filterByCategory(homeProvider.selectedCategory);
+            } else if (homeProvider.selectedArea != null) {
+              homeProvider.filterByArea(homeProvider.selectedArea);
+            } else {
+              homeProvider.reset();
+            }
+          },
         ),
       );
     }
