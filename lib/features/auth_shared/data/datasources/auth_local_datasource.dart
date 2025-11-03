@@ -1,5 +1,5 @@
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
+import '../../../../core/database/database_helper.dart';
 import '../../../../core/error/exceptions.dart';
 import '../models/user_model.dart';
 
@@ -10,40 +10,49 @@ abstract class AuthLocalDataSource {
 }
 
 class AuthLocalDataSourceImpl implements AuthLocalDataSource {
-  final SharedPreferences sharedPreferences;
-  static const String cachedUserKey = 'CACHED_USER';
+  final DatabaseHelper dbHelper;
 
-  AuthLocalDataSourceImpl({required this.sharedPreferences});
+  AuthLocalDataSourceImpl({required this.dbHelper});
 
   @override
   Future<void> cacheUser(UserModel user) async {
     try {
-      final jsonString = json.encode(user.toJson());
-      await sharedPreferences.setString(cachedUserKey, jsonString);
+      final db = await dbHelper.database;
+      await db.insert(
+        DatabaseHelper.tableUser,
+        user.toJson(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
     } catch (e) {
-      throw CacheException('Error al guardar usuario');
+      throw CacheException('Error al guardar usuario en DB');
     }
   }
 
   @override
   Future<UserModel?> getCachedUser() async {
     try {
-      final jsonString = sharedPreferences.getString(cachedUserKey);
-      if (jsonString != null) {
-        return UserModel.fromJson(json.decode(jsonString));
+      final db = await dbHelper.database;
+      final maps = await db.query(
+        DatabaseHelper.tableUser,
+        limit: 1,
+      );
+
+      if (maps.isNotEmpty) {
+        return UserModel.fromJson(maps.first);
       }
       return null;
     } catch (e) {
-      throw CacheException('Error al obtener usuario');
+      throw CacheException('Error al obtener usuario de DB');
     }
   }
 
   @override
   Future<void> clearCache() async {
     try {
-      await sharedPreferences.remove(cachedUserKey);
+      final db = await dbHelper.database;
+      await db.delete(DatabaseHelper.tableUser);
     } catch (e) {
-      throw CacheException('Error al limpiar caché');
+      throw CacheException('Error al limpiar caché de usuario');
     }
   }
 }

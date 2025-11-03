@@ -2,15 +2,16 @@ import 'package:flutter/foundation.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'app/my_app.dart';
 import 'core/application/app_state.dart';
+import 'core/database/database_helper.dart';
 import 'core/network/http_client.dart';
 import 'core/router/app_router.dart';
 
 import 'features/auth_shared/data/datasources/auth_local_datasource.dart';
 import 'features/auth_shared/data/repositories/auth_repository_impl.dart';
 import 'features/auth_shared/domain/repositories/auth_repository.dart';
+import 'features/home/data/datasources/home_remote_datasource_impl.dart';
 import 'features/login/domain/usecases/login_usecase.dart';
 import 'features/register/domain/usecases/register_usecase.dart';
 
@@ -20,11 +21,15 @@ import 'features/register/presentation/providers/register_provider.dart';
 import 'features/meals_shared/data/datasources/meal_remote_datasource.dart';
 import 'features/meals_shared/data/repositories/meal_repository_impl.dart';
 import 'features/meals_shared/domain/repositories/meal_repository.dart';
+
+import 'features/home/data/repositories/home_repository_impl.dart';
+import 'features/home/domain/repositories/home_repository.dart';
 import 'features/home/domain/usecases/search_meals_usecase.dart';
 import 'features/home/domain/usecases/get_categories_usecase.dart';
 import 'features/home/domain/usecases/get_meals_by_category_usecase.dart';
 import 'features/home/domain/usecases/get_areas_usecase.dart';
 import 'features/home/domain/usecases/get_meals_by_area_usecase.dart';
+
 import 'features/meal_detail/domain/usecases/get_meal_by_id_usecase.dart';
 
 import 'features/home/presentation/providers/home_provider.dart';
@@ -39,11 +44,11 @@ import 'features/favorites/presentation/providers/favorites_provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final sharedPreferences = await SharedPreferences.getInstance();
+  final dbHelper = DatabaseHelper.instance;
   final httpClient = HttpClient();
 
   final authLocalDataSource = AuthLocalDataSourceImpl(
-    sharedPreferences: sharedPreferences,
+    dbHelper: dbHelper,
   );
   final AuthRepository authRepository = AuthRepositoryImpl(
     localDataSource: authLocalDataSource,
@@ -57,17 +62,26 @@ void main() async {
   final MealRepository mealRepository = MealRepositoryImpl(
     remoteDataSource: mealRemoteDataSource,
   );
-  final searchMealsUseCase = SearchMealsUseCase(repository: mealRepository);
-  final getCategoriesUseCase = GetCategoriesUseCase(repository: mealRepository);
+
+  final homeRemoteDataSource = HomeRemoteDataSourceImpl(
+    httpClient: httpClient,
+  );
+  final HomeRepository homeRepository = HomeRepositoryImpl(
+    remoteDataSource: homeRemoteDataSource,
+  );
+
+  final searchMealsUseCase = SearchMealsUseCase(repository: homeRepository);
+  final getCategoriesUseCase = GetCategoriesUseCase(repository: homeRepository);
   final getMealsByCategoryUseCase =
-  GetMealsByCategoryUseCase(repository: mealRepository);
-  final getMealByIdUseCase = GetMealByIdUseCase(repository: mealRepository);
-  final getAreasUseCase = GetAreasUseCase(repository: mealRepository);
+  GetMealsByCategoryUseCase(repository: homeRepository);
+  final getAreasUseCase = GetAreasUseCase(repository: homeRepository);
   final getMealsByAreaUseCase =
-  GetMealsByAreaUseCase(repository: mealRepository);
+  GetMealsByAreaUseCase(repository: homeRepository);
+
+  final getMealByIdUseCase = GetMealByIdUseCase(repository: mealRepository);
 
   final favoritesLocalDataSource = FavoritesLocalDataSourceImpl(
-    sharedPreferences: sharedPreferences,
+    dbHelper: dbHelper,
   );
   final FavoritesRepository favoritesRepository = FavoritesRepositoryImpl(
     localDataSource: favoritesLocalDataSource,

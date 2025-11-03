@@ -1,9 +1,9 @@
 import 'package:dartz/dartz.dart';
 import '../../../../core/error/failures.dart';
-import '../../../meals_shared/domain/repositories/meal_repository.dart';
+import '../repositories/home_repository.dart';
 
 class GetAreasUseCase {
-  final MealRepository repository;
+  final HomeRepository repository;
 
   GetAreasUseCase({required this.repository});
 

@@ -1,4 +1,4 @@
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../core/database/database_helper.dart';
 import '../../../../core/error/exceptions.dart';
 
 abstract class FavoritesLocalDataSource {
@@ -9,50 +9,53 @@ abstract class FavoritesLocalDataSource {
 }
 
 class FavoritesLocalDataSourceImpl implements FavoritesLocalDataSource {
-  final SharedPreferences sharedPreferences;
-  static const String favoriteMealsKey = 'FAVORITE_MEALS';
+  final DatabaseHelper dbHelper;
 
-  FavoritesLocalDataSourceImpl({required this.sharedPreferences});
+  FavoritesLocalDataSourceImpl({required this.dbHelper});
 
   @override
   Future<List<String>> getFavoriteMealIds() async {
     try {
-      return sharedPreferences.getStringList(favoriteMealsKey) ?? [];
+      final db = await dbHelper.database;
+      final maps = await db.query(DatabaseHelper.tableFavorites);
+      return maps.map((map) => map['mealId'] as String).toList();
     } catch (e) {
-      throw CacheException('Error al obtener favoritos');
+      throw CacheException('Error al obtener favoritos de DB');
     }
   }
 
   @override
   Future<void> addFavoriteMealId(String mealId) async {
     try {
-      final ids = await getFavoriteMealIds();
-      if (!ids.contains(mealId)) {
-        ids.add(mealId);
-        await sharedPreferences.setStringList(favoriteMealsKey, ids);
-      }
+      final db = await dbHelper.database;
+      await db.insert(
+        DatabaseHelper.tableFavorites,
+        {'mealId': mealId},
+      );
     } catch (e) {
-      throw CacheException('Error al añadir favorito');
+      throw CacheException('Error al añadir favorito en DB');
     }
   }
 
   @override
   Future<void> removeFavoriteMealId(String mealId) async {
     try {
-      final ids = await getFavoriteMealIds();
-      if (ids.contains(mealId)) {
-        ids.remove(mealId);
-        await sharedPreferences.setStringList(favoriteMealsKey, ids);
-      }
+      final db = await dbHelper.database;
+      await db.delete(
+        DatabaseHelper.tableFavorites,
+        where: 'mealId = ?',
+        whereArgs: [mealId],
+      );
     } catch (e) {
-      throw CacheException('Error al eliminar favorito');
+      throw CacheException('Error al eliminar favorito de DB');
     }
   }
 
   @override
   Future<void> clearFavorites() async {
     try {
-      await sharedPreferences.remove(favoriteMealsKey);
+      final db = await dbHelper.database;
+      await db.delete(DatabaseHelper.tableFavorites);
     } catch (e) {
       throw CacheException('Error al limpiar favoritos');
     }

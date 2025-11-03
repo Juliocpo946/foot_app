@@ -1,40 +1,25 @@
-import 'package:dio/dio.dart';
+import 'package:http/http.dart' as http;
+import '../../core/utils/logger.dart';
 
 class HttpClient {
   static final HttpClient _instance = HttpClient._internal();
-  late final Dio dio;
+  late final http.Client client;
 
   factory HttpClient() => _instance;
 
   HttpClient._internal() {
-    dio = Dio(
-      BaseOptions(
-        connectTimeout: const Duration(seconds: 30),
-        receiveTimeout: const Duration(seconds: 30),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      ),
-    );
-
-    dio.interceptors.add(
-      InterceptorsWrapper(
-        onError: (error, handler) {
-          _logError(error);
-          return handler.next(error);
-        },
-      ),
-    );
+    client = http.Client();
   }
 
-  void _logError(DioException error) {
-    final timestamp = DateTime.now().toString().substring(0, 19);
-    final statusCode = error.response?.statusCode ?? 0;
-    print('[$timestamp] [HTTP_CLIENT] [ERROR] ${error.message} (Code: $statusCode)');
+  void logError(String url, int statusCode, String body) {
+    AppLogger.logError(
+      'HTTP_CLIENT',
+      'Error en $url (Code: $statusCode)',
+      body,
+    );
   }
 
   void dispose() {
-    dio.close();
+    client.close();
   }
 }
