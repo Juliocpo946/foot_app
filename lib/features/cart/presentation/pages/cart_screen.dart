@@ -82,7 +82,7 @@ class _CartScreenState extends State<CartScreen> {
                                   return Container(
                                     width: 80,
                                     height: 80,
-                                    color: Theme.of(context).colorScheme.surfaceVariant,
+                                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
                                     child: Icon(
                                       Icons.restaurant,
                                       color: Theme.of(context).colorScheme.onSurfaceVariant,
